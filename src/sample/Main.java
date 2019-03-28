@@ -1,12 +1,8 @@
 package sample;
 
-import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
@@ -14,15 +10,11 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-import javafx.stage.Stage;
 
 import javax.swing.*;
 import java.util.Locale;
 
-public class Main extends Application {
-    @FXML
-    Label countryLabel, cityLabel, weatherLabel, ratesLabes, zlotyLabel;
-
+public class Main{
 
     private static void initAndShowGUI(Service s, String weatherJson, Double rate1, Double rate2) {
         // This method is invoked on the EDT thread
@@ -34,12 +26,7 @@ public class Main extends Application {
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                initFX(fxPanel, s, weatherJson, rate1, rate2);
-            }
-        });
+        Platform.runLater(() -> initFX(fxPanel, s, weatherJson, rate1, rate2));
     }
 
     private static void initFX(JFXPanel fxPanel,Service s, String weatherJson, Double rate1, Double rate2) {
@@ -94,18 +81,6 @@ public class Main extends Application {
     }
 
 
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
-        primaryStage.setTitle("Country Info");
-        primaryStage.setScene(new Scene(root, 300, 275));
-        countryLabel.setText(countryLabel.getText() + " ");
-
-
-        primaryStage.show();
-    }
-
-
     public static void main(String[] args) {
         try {
             Service s = new Service("Spain");
@@ -114,12 +89,7 @@ public class Main extends Application {
             Double rate1 = s.getRateFor("USD");
             Double rate2 = s.getNBPRate();
 
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    initAndShowGUI(s, weatherJson, rate1, rate2);
-                }
-            });
+            SwingUtilities.invokeLater(() -> initAndShowGUI(s, weatherJson, rate1, rate2));
 //            launch(args);
 
         } catch (Exception e) {

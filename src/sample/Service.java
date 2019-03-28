@@ -17,12 +17,10 @@ import java.net.URL;
 import java.util.Currency;
 import java.util.Locale;
 
-public class Service {
+class Service {
 
-    private final String USER_AGENT = "Mozilla/5.0";
     Locale locCountry;
-    String country;
-    HttpURLConnection connection;
+    final String country;
     Currency curr;
     String currComparison;
 
@@ -50,9 +48,8 @@ public class Service {
     public String getWeather(String miasto) {
         String link = "http://api.openweathermap.org/data/2.5/weather?q=" + miasto + "," + locCountry.getISO3Country() +
                 "&appid=0c0a608bb739e0d24c9e02dee048b0c6" + "&units=metric";
-        String response = stringFromLink(link);
 
-        return response;
+        return stringFromLink(link);
     }
 
     public Double getRateFor(String currencyCode) {
@@ -64,7 +61,7 @@ public class Service {
         //Parsing response to JSONObject and then parsing to rate
         if("0.0".equals(response))
             return 0.0;
-        String rate = "";
+        String rate;
         double rateDouble = 0;
         try {
             JSONParser jsonParser = new JSONParser();
@@ -79,17 +76,18 @@ public class Service {
 //            in.close();
 
         //print result
-        System.out.println(response.toString());
+        System.out.println(response);
         System.out.println(rateDouble);
         return rateDouble;
     }
 
-    String stringFromLink(String link) {
-        StringBuffer response = new StringBuffer();
+    private String stringFromLink(String link) {
+        StringBuilder response = new StringBuilder();
         try {
             URL urlLink = new URL(link);
             HttpURLConnection urlConnection = (HttpURLConnection) urlLink.openConnection();
             urlConnection.setRequestMethod("GET");
+            String USER_AGENT = "Mozilla/5.0";
             urlConnection.setRequestProperty("USER_AGENT", USER_AGENT);
 
             int responseCode = urlConnection.getResponseCode();
@@ -123,7 +121,7 @@ public class Service {
 
         String html = "http://www.nbp.pl/kursy/kursya.html";
         String htmlb = "http://www.nbp.pl/kursy/kursyb.html";
-        Double tt = null;
+        Double tt;
         if ((tt = findNBPRates(html)) != null)
             return tt;
         else if ((tt = findNBPRates(htmlb)) != null)
@@ -131,7 +129,7 @@ public class Service {
         else return 0.0;
     }
 
-    Double findNBPRates(String link) {
+    private Double findNBPRates(String link) {
         try {
             Document doc = Jsoup.connect(link).get();
             Elements tableElements = doc.select("table");
@@ -146,8 +144,7 @@ public class Service {
 
                 if (rowItems.size() > 0 && rowItems.get(1).text().contains(curr.getCurrencyCode())) {
                     found = true;
-                    for (int j = 0; j < rowItems.size(); j++)
-                        System.out.println(rowItems.get(j).text());
+                    for (Element rowItem : rowItems) System.out.println(rowItem.text());
 
                     String val = rowItems.get(2).text().replace(",", ".");
                     return Double.parseDouble(val);
